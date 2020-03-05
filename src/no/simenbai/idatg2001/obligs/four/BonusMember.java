@@ -68,6 +68,9 @@ public abstract class BonusMember {
      * @return the int
      */
     public int findQualificationPoints(LocalDate date) {
+        if(date == null){
+            throw new IllegalArgumentException("Date can't be null");
+        }
         if (ChronoUnit.DAYS.between(this.enrolledDate, date) < 365) {
             return getPoints();
         }

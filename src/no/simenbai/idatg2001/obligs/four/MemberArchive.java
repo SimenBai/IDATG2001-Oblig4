@@ -1,5 +1,6 @@
 package no.simenbai.idatg2001.obligs.four;
 
+import java.lang.reflect.Member;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Random;
@@ -90,7 +91,7 @@ public class MemberArchive {
      *
      * @param date the date
      */
-    public void checkMembers(LocalDate date) {
+    public void checkMembers(LocalDate date) throws IllegalArgumentException{
         for (int i = 0; i < members.size(); i++) {
             BonusMember member = members.get(i);
             int qualifyingPoints = member.findQualificationPoints(date);

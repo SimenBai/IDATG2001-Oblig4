@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
+import java.util.logging.Logger;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -17,6 +18,9 @@ class BonusMemberTest {
     private LocalDate testDate;
     private Personals ole;
     private Personals tove;
+
+    private static final Logger LOGGER = Logger.getLogger(BonusMemberTest.class.getName());
+
 
     @BeforeEach
     void setUp() {
@@ -93,4 +97,61 @@ class BonusMemberTest {
         System.out.println("Test nr 8: Trying correct password on Tove.");
         assertTrue(tove.okPassword("tove"));
     }
+
+    /**
+     * Tests if the constructor handels null values properly
+     */
+    @Test
+    void testInvalidParametersInConstructor(){
+        try {
+            LOGGER.info("Testing basic with both null");
+            BonusMember bm = new BasicMember(1,null, null);
+            fail();
+        }
+        catch(IllegalArgumentException ignored){}
+        try {
+            LOGGER.info("Testing basic with enrolled date null");
+            BonusMember bm1 = new BasicMember(2,this.ole, null);
+            fail();
+        }
+        catch(IllegalArgumentException ignored){}
+        try {
+            LOGGER.info("Testing basic with enrolled date null");
+            BonusMember bm2 = new BasicMember(3,null, testDate);
+            fail();
+        }
+        catch(IllegalArgumentException ignored){}
+        try {
+            LOGGER.info("Testing silver with both null");
+            BonusMember bm3 = new SilverMember(1,null, null, 100000);
+            fail();
+        }
+        catch(IllegalArgumentException ignored){}
+        try {
+            LOGGER.info("Testing basic with enrolled date null");
+            BonusMember bm4 = new SilverMember(2,this.ole, null, 100000);
+            fail();
+        }
+        catch(IllegalArgumentException ignored){}
+        try {
+            LOGGER.info("Testing basic with enrolled date null");
+            BonusMember bm5 = new SilverMember(3,null, testDate, 100000);
+            fail();
+        }
+        catch(IllegalArgumentException ignored){}
+    }
+
+    /**
+     * Tests if findQualificationPoints handels null values properly
+     */
+    @Test
+    void testInvalidParametersInFindQualificationPoints(){
+        try {
+            BonusMember bm = new BasicMember(1, this.ole, testDate);
+            LOGGER.info("Testing qualification points method with null value");
+            bm.findQualificationPoints(null);
+            fail();
+        } catch(IllegalArgumentException ignored){}
+    }
+
 }
