@@ -1,4 +1,4 @@
-package no.simenbai.idatg2001.obligs.two;
+package no.simenbai.idatg2001.obligs.four;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

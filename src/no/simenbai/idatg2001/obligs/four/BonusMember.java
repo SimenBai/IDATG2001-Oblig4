@@ -1,14 +1,13 @@
-package no.simenbai.idatg2001.obligs.two;
+package no.simenbai.idatg2001.obligs.four;
 
 import java.time.LocalDate;
-import java.time.Period;
 import java.time.temporal.ChronoUnit;
 
 
 /**
  * The type Bonus member.
  */
-public class BonusMember {
+public abstract class BonusMember {
     /**
      * The multiplication factor for silver bonus.
      */
@@ -32,6 +31,11 @@ public class BonusMember {
      * @param points       the points
      */
     BonusMember(int memberNo, Personals personals, LocalDate enrolledDate, int points) {
+        if (personals == null) {
+            throw new IllegalArgumentException("Personal information is null");
+        } else if (enrolledDate == null) {
+            throw new IllegalArgumentException("Enrolled date is null");
+        }
         this.memberNo = memberNo;
         this.personals = personals;
         this.enrolledDate = enrolledDate;
@@ -46,6 +50,11 @@ public class BonusMember {
      * @param enrolledDate the enrolled date
      */
     BonusMember(int memberNo, Personals personals, LocalDate enrolledDate) {
+        if (personals == null) {
+            throw new IllegalArgumentException("Personal information is null");
+        } else if (enrolledDate == null) {
+            throw new IllegalArgumentException("Enrolled date is null");
+        }
         this.memberNo = memberNo;
         this.personals = personals;
         this.enrolledDate = enrolledDate;
@@ -59,7 +68,7 @@ public class BonusMember {
      * @return the int
      */
     public int findQualificationPoints(LocalDate date) {
-        if(ChronoUnit.DAYS.between(this.enrolledDate, date) < 365){
+        if (ChronoUnit.DAYS.between(this.enrolledDate, date) < 365) {
             return getPoints();
         }
         return 0;
@@ -80,7 +89,7 @@ public class BonusMember {
      *
      * @param points the points
      */
-    public void registerPoints(int points){
+    public void registerPoints(int points) {
         this.bonusPoints += points;
     }
 

@@ -1,4 +1,4 @@
-package no.simenbai.idatg2001.obligs.two;
+package no.simenbai.idatg2001.obligs.four;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
