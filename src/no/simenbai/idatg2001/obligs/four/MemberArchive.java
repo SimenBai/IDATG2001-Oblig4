@@ -44,6 +44,17 @@ public class MemberArchive {
         this.members = new ArrayList<>();
     }
 
+    public void populate(){
+        LocalDate testDate = LocalDate.of(2008, 2, 10);
+        Personals ole = new Personals("Olsen", "Ole",
+                "ole.olsen@dot.com", "ole");
+        Personals tove = new Personals("Hansen", "Tove",
+                "tove.hansen@dot.com", "tove");
+
+        this.addMember(ole, testDate);
+        this.addMember(tove, testDate);
+    }
+
     /**
      * Add member
      *
@@ -126,6 +137,10 @@ public class MemberArchive {
             }
         }
         return null;
+    }
+
+    public ArrayList<BonusMember> getMembers() {
+        return members;
     }
 
     private int findAvailableNumber() {
