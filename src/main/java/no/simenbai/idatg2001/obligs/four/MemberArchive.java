@@ -1,8 +1,5 @@
 package no.simenbai.idatg2001.obligs.four;
 
-import javafx.application.Application;
-
-import java.lang.reflect.Member;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Random;
