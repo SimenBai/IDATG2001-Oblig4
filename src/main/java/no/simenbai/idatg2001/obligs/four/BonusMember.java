@@ -131,4 +131,39 @@ public abstract class BonusMember {
     public int getPoints() {
         return bonusPoints;
     }
+
+
+    /**
+     * @param member The member you want to check
+     * @return The type of the member
+     */
+    public static MemberType getMemberType(BonusMember member){
+        if (member instanceof BasicMember) {
+            return MemberType.BASICMEMBER;
+        } else if (member instanceof SilverMember) {
+            return MemberType.SILVERMEMBER;
+        } else {
+            return MemberType.GOLDMEMBER;
+        }
+    }
+
+    /**
+     * A member type enum to make it easier to handle the different types
+     */
+    enum MemberType {
+        BASICMEMBER ("Basic member"),
+        SILVERMEMBER ("Silver member"),
+        GOLDMEMBER ("Gold member");
+
+        private String name;
+
+        MemberType(String name) {
+            this.name = name;
+        }
+
+        @Override
+        public String toString() {
+            return this.name;
+        }
+    }
 }
