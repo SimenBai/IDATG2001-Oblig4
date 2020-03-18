@@ -1,6 +1,5 @@
 package no.simenbai.idatg2001.obligs.four;
 
-import java.lang.reflect.Member;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Random;
@@ -40,6 +39,17 @@ public class MemberArchive {
      */
     public MemberArchive(){
         this.members = new ArrayList<>();
+    }
+
+    public void populate(){
+        LocalDate testDate = LocalDate.of(2008, 2, 10);
+        Personals ole = new Personals("Olsen", "Ole",
+                "ole.olsen@dot.com", "ole");
+        Personals tove = new Personals("Hansen", "Tove",
+                "tove.hansen@dot.com", "tove");
+
+        this.addMember(ole, testDate);
+        this.addMember(tove, testDate);
     }
 
     /**
@@ -126,6 +136,10 @@ public class MemberArchive {
         return null;
     }
 
+    public ArrayList<BonusMember> getMembers() {
+        return members;
+    }
+
     private int findAvailableNumber() {
         while (true) {
             int memberNo = RANDOM_NUMBER.nextInt();
@@ -142,5 +156,7 @@ public class MemberArchive {
      */
     public static void main(String[] args) {
         // write your code here
+        Gui gui = new Gui();
+        gui.startGui("");
     }
 }
