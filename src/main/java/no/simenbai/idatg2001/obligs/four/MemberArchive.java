@@ -114,7 +114,7 @@ public class MemberArchive {
                                 member.getPoints()
                         )
                 );
-            } else if (qualifyingPoints >= SILVER_LIMIT && !(member instanceof SilverMember)) {
+            } else if (qualifyingPoints >= SILVER_LIMIT && !(member instanceof SilverMember) && qualifyingPoints < GOLD_LIMIT) {
                 members.set(i,
                         new SilverMember(
                                 member.getMemberNo(),
@@ -142,7 +142,7 @@ public class MemberArchive {
 
     private int findAvailableNumber() {
         while (true) {
-            int memberNo = RANDOM_NUMBER.nextInt();
+            int memberNo = Math.abs(RANDOM_NUMBER.nextInt());
             if (findMember(memberNo) == null) {
                 return memberNo;
             }
