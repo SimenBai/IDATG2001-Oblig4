@@ -6,12 +6,15 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.MouseButton;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
@@ -34,7 +37,7 @@ public class Gui extends Application {
         drawMemberArchiveTable();
     }
 
-    public void showScene(StackPane root) {
+    public void showScene(Pane root) {
         this.stage.setScene(new Scene(root, 800, 600));
         this.stage.show();
     }
@@ -60,6 +63,7 @@ public class Gui extends Application {
 
     public void drawMemberArchiveTable() {
         TableView<BonusMember> tableView = new TableView<>();
+        tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         tableView.setPlaceholder(new Label("No rows to display"));
 
         TableColumn<BonusMember, Integer> memberNumberColumn = new TableColumn<>("Member number");
@@ -97,10 +101,63 @@ public class Gui extends Application {
         tableView.setItems(list);
 
         tableView.getColumns().addAll(memberNumberColumn, nameColumn, pointsColumn, memberTypeColumn);
-        
-        StackPane root = new StackPane();
-        root.getChildren().add(tableView);
+
+        tableView.setRowFactory(tv -> {
+            TableRow<BonusMember> row = new TableRow<>();
+            row.setOnMouseClicked(event -> {
+                if (!row.isEmpty() && event.getButton() == MouseButton.SECONDARY) {
+                    BonusMember clickedRow = row.getItem();
+                    System.out.println(clickedRow.getMemberNo());
+                }
+            });
+            return row;
+        });
+
+        BorderPane root = new BorderPane();
+        root.setTop(getSettingMenu(tableView));
+        root.setCenter(tableView);
         showScene(root);
+    }
+
+    public GridPane getSettingMenu(TableView<BonusMember> tableView) {
+        TableView.TableViewSelectionModel<BonusMember> selectionModel = tableView.getSelectionModel();
+        selectionModel.setSelectionMode(SelectionMode.SINGLE);
+        
+        Button detailsButton = new Button("See details of selected member");
+        detailsButton.setOnAction(actionEvent -> {
+            System.out.println("Details");
+            showDetails(selectionModel.getSelectedItem());
+        });
+
+        Button deleteButton = new Button("Delete selected member");
+        deleteButton.setOnAction(actionEvent -> {
+            System.out.println("DELETE " + selectionModel.getSelectedItem().getMemberNo());
+        });
+
+        Button upgradeButton = new Button("Upgrade eligible members");
+        upgradeButton.setOnAction(actionEvent -> {
+            System.out.println("UPGRADE ");
+        });
+
+        Button addButton = new Button("Add a members");
+        addButton.setOnAction(actionEvent -> {
+            System.out.println("ADD");
+        });
+
+        GridPane gSettings = new GridPane();
+        gSettings.setAlignment(Pos.CENTER);
+        gSettings.setHgap(10);
+        gSettings.setVgap(10);
+        gSettings.setPadding(new Insets(20));
+        gSettings.add(addButton, 1,0);
+        gSettings.add(detailsButton, 2, 0);
+        gSettings.add(upgradeButton, 3, 0);
+        gSettings.add(deleteButton, 4, 0);
+        return gSettings;
+    }
+
+    private void showDetails(BonusMember selectedItem) {
+
     }
 
     private ObservableList<BonusMember> getMemberList() {
