@@ -120,7 +120,10 @@ public class Gui extends Application {
         });
 
         Button addButton = new Button("Add a members");
-        addButton.setOnAction(actionEvent -> System.out.println("ADD"));
+        addButton.setOnAction(actionEvent -> {
+            addUserView();
+            drawMemberArchiveTable();
+        });
 
         GridPane gSettings = new GridPane();
         gSettings.setAlignment(Pos.CENTER);
@@ -222,9 +225,6 @@ public class Gui extends Application {
 
         Text title = new Text("Editing member: " + bonusMember.getMemberNo());
 
-        bonusMember.registerPoints(100);
-        bonusMember.getPersonals().changePassword("1", "2");
-
         UnaryOperator<TextFormatter.Change> filter = change -> {
             String text = change.getText();
 
@@ -279,6 +279,71 @@ public class Gui extends Application {
         editStage.initModality(Modality.APPLICATION_MODAL);
         editStage.showAndWait();
         return true;
+    }
+
+    private void addUserView() {
+        Stage editStage = new Stage();
+        // Seems to not be needed
+        // editStage.setOnHiding(windowEvent -> System.out.println("Stage is closing"));
+
+        GridPane gridPane = new GridPane();
+        gridPane.setHgap(10);
+        editStage.setTitle("Add new member");
+
+        Text title = new Text("Adding new member");
+
+
+        Label firstNameLabel = new Label("First name: ");
+        TextField firstName = new TextField();
+
+        Label surnameLabel = new Label("Surname:");
+        TextField surname = new TextField();
+
+        Label emailLabel = new Label("Email address:");
+        TextField email = new TextField();
+
+        Text spacer = new Text(" ");
+        Text spacer1 = new Text(" ");
+
+        Label passwordLabel = new Label("Password:");
+        PasswordField password = new PasswordField();
+
+        Button saveButton = new Button("Save details");
+        saveButton.setOnAction(actionEvent -> {
+            if (firstName.getText().isEmpty() ||
+                    surname.getText().isEmpty() ||
+                    email.getText().isEmpty() ||
+                    password.getText().isEmpty()) {
+                return;
+            }
+
+            if (email.getText().matches("^[\\w!#$%&'*+/=?`{|}~^-]+(?:\\.[\\w!#$%&'*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$")) {
+                System.out.println(email.getText());
+                Personals personals = new Personals(firstName.getText(), surname.getText(), email.getText(), password.getText());
+                memberArchive.addMember(personals, LocalDate.now());
+                editStage.close();
+            }
+        });
+
+        int i = 0;
+        gridPane.add(title, 0, i++);
+        gridPane.add(firstNameLabel, 0, i++);
+        gridPane.add(firstName, 0, i++);
+        gridPane.add(surnameLabel, 0, i++);
+        gridPane.add(surname, 0, i++);
+        gridPane.add(spacer, 0, i++);
+        gridPane.add(emailLabel, 0, i++);
+        gridPane.add(email, 0, i++);
+        gridPane.add(spacer1, 0, i++);
+        gridPane.add(passwordLabel, 0, i++);
+        gridPane.add(password, 0, i++);
+        gridPane.add(saveButton, 0, i);
+
+        gridPane.setPadding(new Insets(20));
+        editStage.setScene(new Scene(gridPane));
+        editStage.initOwner(this.stage);
+        editStage.initModality(Modality.APPLICATION_MODAL);
+        editStage.showAndWait();
     }
 
     private ObservableList<BonusMember> getMemberList() {
