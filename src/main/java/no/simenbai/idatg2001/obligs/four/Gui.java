@@ -4,8 +4,6 @@ import javafx.application.Application;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -15,12 +13,12 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.StackPane;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.time.LocalDate;
+import java.util.function.UnaryOperator;
 
 public class Gui extends Application {
     private Stage stage;
@@ -31,9 +29,9 @@ public class Gui extends Application {
     }
 
     @Override
-    public void start(Stage stage) throws Exception {
+    public void start(Stage stage) {
         this.stage = stage;
-        setTitle("Hello world");
+        setTitle("Bonus member application");
 
         this.memberArchive = new MemberArchive();
         this.memberArchive.populate();
@@ -48,21 +46,6 @@ public class Gui extends Application {
 
     private void setTitle(String title) {
         stage.setTitle(title);
-    }
-
-    public void drawHelloWorldBtn() {
-        StackPane root = new StackPane();
-        Button btn = new Button();
-        btn.setText("Say 'Hello World'");
-        btn.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                setTitle("Test");
-                drawHelloWorldBtn();
-            }
-        });
-        root.getChildren().add(btn);
-        showScene(root);
     }
 
     public void drawMemberArchiveTable() {
@@ -82,17 +65,13 @@ public class Gui extends Application {
 
 
         memberNumberColumn.setCellValueFactory(new PropertyValueFactory<>("memberNo"));
-        nameColumn.setCellValueFactory(cellvalue -> {
-            return new SimpleStringProperty(
-                    cellvalue.getValue().getPersonals().getFirstname() +
-                            " " +
-                            cellvalue.getValue().getPersonals().getSurname());
-        });
+        nameColumn.setCellValueFactory(cellvalue -> new SimpleStringProperty(
+                cellvalue.getValue().getPersonals().getFirstname() +
+                        " " +
+                        cellvalue.getValue().getPersonals().getSurname()));
 
         pointsColumn.setCellValueFactory(new PropertyValueFactory<>("points"));
-        memberTypeColumn.setCellValueFactory(cellvalue -> {
-            return new SimpleStringProperty(BonusMember.getMemberType(cellvalue.getValue()).toString());
-        });
+        memberTypeColumn.setCellValueFactory(cellvalue -> new SimpleStringProperty(BonusMember.getMemberType(cellvalue.getValue()).toString()));
 
 
         ObservableList<BonusMember> list = getMemberList();
@@ -123,23 +102,25 @@ public class Gui extends Application {
 
         Button detailsButton = new Button("See details of selected member");
         detailsButton.setOnAction(actionEvent -> {
-            showDetails(selectionModel.getSelectedItem());
+            if (showDetails(selectionModel.getSelectedItem())) {
+                drawMemberArchiveTable();
+            }
         });
 
         Button deleteButton = new Button("Delete selected member");
         deleteButton.setOnAction(actionEvent -> {
-            System.out.println("DELETE " + selectionModel.getSelectedItem().getMemberNo());
+            memberArchive.removeMember(selectionModel.getSelectedItem().getMemberNo());
+            drawMemberArchiveTable();
         });
 
         Button upgradeButton = new Button("Upgrade eligible members");
         upgradeButton.setOnAction(actionEvent -> {
             memberArchive.checkMembers(LocalDate.now());
+            drawMemberArchiveTable();
         });
 
         Button addButton = new Button("Add a members");
-        addButton.setOnAction(actionEvent -> {
-            System.out.println("ADD");
-        });
+        addButton.setOnAction(actionEvent -> System.out.println("ADD"));
 
         GridPane gSettings = new GridPane();
         gSettings.setAlignment(Pos.CENTER);
@@ -153,11 +134,15 @@ public class Gui extends Application {
         return gSettings;
     }
 
-    private void showDetails(BonusMember bonusMember) {
-        if(bonusMember == null){
-            return;
+    private boolean showDetails(BonusMember bonusMember) {
+        if (bonusMember == null) {
+            return false;
         }
+
+        final boolean[] returnValue = {false};
+
         Stage dialog = new Stage();
+        dialog.setTitle("Detailed member view");
         GridPane gridPane = new GridPane();
         gridPane.setHgap(10);
 
@@ -187,6 +172,9 @@ public class Gui extends Application {
         Text spacer = new Text(" ");
         Text spacer1 = new Text(" ");
 
+        Button editButton = new Button("Edit details");
+        editButton.setOnAction(actionEvent -> returnValue[0] = editView(dialog, bonusMember));
+
         gridPane.add(displaying, 0, 0);
         gridPane.add(memberNo, 1, 0);
 
@@ -210,6 +198,9 @@ public class Gui extends Application {
         gridPane.add(pointsLabel, 0, 7);
         gridPane.add(points, 1, 7);
 
+        gridPane.add(spacer1, 0, 8);
+        gridPane.add(editButton, 0, 9, 2, 1);
+        editButton.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
 
 
         gridPane.setPadding(new Insets(20));
@@ -217,6 +208,77 @@ public class Gui extends Application {
         dialog.initOwner(this.stage);
         dialog.initModality(Modality.APPLICATION_MODAL);
         dialog.showAndWait();
+        return returnValue[0];
+    }
+
+    private boolean editView(Stage details, BonusMember bonusMember) {
+        Stage editStage = new Stage();
+        // Seems to not be needed
+        // editStage.setOnHiding(windowEvent -> System.out.println("Stage is closing"));
+
+        GridPane gridPane = new GridPane();
+        gridPane.setHgap(10);
+        editStage.setTitle("Edit member");
+
+        Text title = new Text("Editing member: " + bonusMember.getMemberNo());
+
+        bonusMember.registerPoints(100);
+        bonusMember.getPersonals().changePassword("1", "2");
+
+        UnaryOperator<TextFormatter.Change> filter = change -> {
+            String text = change.getText();
+
+            if (text.matches("[0-9]*")) {
+                return change;
+            }
+
+            return null;
+        };
+        TextFormatter<String> textFormatter = new TextFormatter<>(filter);
+        Label registerPointsLabel = new Label("Register points:");
+        TextField points = new TextField();
+        points.setTextFormatter(textFormatter);
+
+        Text spacer = new Text(" ");
+
+        Label changePassword = new Label("Change password:");
+        Label password1Label = new Label("Old password:");
+        PasswordField password1 = new PasswordField();
+        Label password2Label = new Label("New password:");
+        PasswordField password2 = new PasswordField();
+
+        Button saveButton = new Button("Save details");
+        saveButton.setOnAction(actionEvent -> {
+            if (!points.getText().isEmpty()) {
+                //We know this must be an integer because of the text formatter
+                bonusMember.registerPoints(Integer.parseInt(points.getText()));
+            }
+            if (!password1.getText().isEmpty()) {
+                if (!password2.getText().isEmpty()) {
+                    bonusMember.getPersonals().changePassword(password1.getText(), password2.getText());
+                }
+            }
+            editStage.close();
+        });
+
+        int i = 0;
+        gridPane.add(title, 0, i++);
+        gridPane.add(registerPointsLabel, 0, i++);
+        gridPane.add(points, 0, i++);
+        gridPane.add(spacer, 0, i++);
+        gridPane.add(changePassword, 0, i++);
+        gridPane.add(password1Label, 0, i++);
+        gridPane.add(password1, 0, i++);
+        gridPane.add(password2Label, 0, i++);
+        gridPane.add(password2, 0, i++);
+        gridPane.add(saveButton, 0, i);
+
+        gridPane.setPadding(new Insets(20));
+        editStage.setScene(new Scene(gridPane));
+        editStage.initOwner(details);
+        editStage.initModality(Modality.APPLICATION_MODAL);
+        editStage.showAndWait();
+        return true;
     }
 
     private ObservableList<BonusMember> getMemberList() {

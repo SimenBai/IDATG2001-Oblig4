@@ -136,6 +136,10 @@ public class MemberArchive {
         return null;
     }
 
+    public void removeMember(int memberNo){
+        members.removeIf(member -> member.getMemberNo() == memberNo);
+    }
+
     public ArrayList<BonusMember> getMembers() {
         return members;
     }
